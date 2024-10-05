@@ -1,0 +1,208 @@
+// ----------------------------------
+// RSDK Project: Sonic 1/Sonic 2
+// Script Description: Decoration
+// Script Author: Christian Whitehead/Simon Thomley
+// Unpacked by Rubberduckycooly's script unpacker
+// ----------------------------------
+
+//-------Aliases-------//
+private alias 28 : TYPE_DECORATION
+public value cameraup = 0;
+public value playerhealth = 0;
+public value bossdefeated = 0;
+
+reserve function IntroDrawing
+
+function IntroDrawing
+	switch object.state
+	case 0
+		object.value1 = 255
+		DrawRect(0, 0, screen.xsize, screen.ysize, 0, 0, 0, object.value1)
+
+	break
+	case 1
+
+		DrawRect(0, 0, screen.xsize, 30, 0, 0, 0, 255)
+
+		DrawRect(0, 210, screen.xsize, 30, 0, 0, 0, 255)
+
+
+		object.value1  -= 15
+		if object.value1  < 0
+			object.value1  = 0
+			object.value2 = 255
+		end if
+		DrawRect(0, 0, screen.xsize, screen.ysize, 0, 0, 0, object.value1)
+		break
+	case 2
+		DrawRect(0, 0, screen.xsize, 30, 0, 0, 0, 255)
+
+		DrawRect(0, 210, screen.xsize, 30, 0, 0, 0, 255)		
+
+		object.value2  -= 15
+		if object.value2  < 0
+			object.value2 = 0
+			object.state++
+		end if
+		DrawRect(0, 0, screen.xsize, screen.ysize, color7, color7, color7, object.value2)
+	break
+	case 4
+	
+
+		if object[1].state > 2
+		object.inkEffect = INK_ALPHA
+		object.alpha = 48
+
+		DrawSpriteScreenFX(0, FX_INK, screen.xcenter, screen.ycenter)	
+		end if
+		
+		
+	
+
+
+
+		DrawRect(0, 0, screen.xsize, 30, 0, 0, 0, 255)
+
+		DrawRect(0, 210, screen.xsize, 30, 0, 0, 0, 255)	
+		
+
+		if object[0].state == OpenPlayer_Dead	
+		StopMusic()
+		DrawRect(0, 0, screen.xsize, screen.ysize, 0, 0, 0, 255)
+		end if
+	break	
+	default
+
+	
+
+		if object[1].state > 2
+		object.inkEffect = INK_ALPHA
+		object.alpha = 48
+
+		DrawSpriteScreenFX(0, FX_INK, screen.xcenter, screen.ycenter)	
+		end if
+		
+		
+	
+
+
+
+		DrawRect(0, 0, screen.xsize, 30, 0, 0, 0, 255)
+
+		DrawRect(0, 210, screen.xsize, 30, 0, 0, 0, 255)	
+
+		if object[0].state == OpenPlayer_Dead
+		StopMusic()
+		DrawRect(0, 0, screen.xsize, screen.ysize, 0, 0, 0, 255)
+		end if
+	
+	break		
+	end switch
+
+		if object[0].state == OpenPlayer_Dead
+		StopMusic()
+		DrawRect(0, 0, screen.xsize, screen.ysize, 0, 0, 0, 255)
+		end if
+
+end function
+
+event ObjectMain
+	object.drawOrder = 5
+	switch object.state
+		case 0
+			bossdefeated = 0
+			playerhealth = 5
+			object[0].controlmode = -1
+			object[0].speed = 0
+			object[0].xvel = 0
+			object[0].yvel = 0
+			object.value0++
+			if object.value0 == 2
+				PlayMusic(0)
+			end if
+
+
+			if object.value0 == 15
+				
+				object.value0 = 0
+				object.state++
+			end if
+		break
+		case 1
+			object.value0++
+
+			if object.value0 >= 2
+				
+				object[0].animation = 1
+				cameraup = 1
+			end if
+
+			if object.value0 == 360
+				object.value0 = 0
+				object.state++
+			end if
+		break
+		case 2
+			object[0].controlmode = 0
+			cameraup = 0
+		break
+	end switch
+end event
+
+event ObjectDraw
+
+	object.drawOrder = 6
+
+	CallFunction(IntroDrawing)
+
+	if playerhealth <= 1
+		temp0 = 0
+		while temp0 < 14
+			DrawRect(0, 0, screen.xsize, screen.ysize, color7, 0, 0, 10)	
+			temp0++
+		loop
+	else
+		if object[1].state >= 3
+			temp0 = 0
+			while temp0 < 14
+				DrawRect(0, 0, screen.xsize, screen.ysize, color7, 0, 0, 10)	
+				temp0++
+			loop
+		else
+			temp0 = 0
+			while temp0 < 8
+				DrawRect(0, 0, screen.xsize, screen.ysize, color7, 0, 0, 10)	
+				temp0++
+			loop
+		end if	
+	end if	
+
+end event
+
+
+event ObjectStartup
+	LoadSpriteSheet("Blueprint/Objects.gif")		
+	SpriteFrame(-256, -200, 512, 256, 0, 256) //0 THE FLAMES OF DIASTER		
+
+	//SetMusicTrack("SUB_Loop.ogg", 0, 328814)
+	SetMusicTrack("SUB_Phase1.ogg", 0, 6104502)
+	SetMusicTrack("SUB_Phase2.ogg", 1, 1746375)
+	SetMusicTrack("SUB_BossEnd.ogg", 2, 0)	
+
+	LoadSpriteSheet("Blueprint/Objects.gif")
+	SpriteFrame(0, 0, 16, 64, 495, 191)	//meter
+
+
+	foreach (TypeName[HUD Stuff], arrayPos0, ALL_ENTITIES)
+		object[arrayPos0].priority = PRIORITY_ACTIVE
+	next
+end event
+
+event RSDKDraw
+	DrawSprite(0)
+end event
+
+event RSDKLoad
+	LoadSpriteSheet("Global/Display.gif")
+	SpriteFrame(-16, -16, 32, 32, 1, 143)
+end event

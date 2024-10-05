@@ -1,0 +1,93 @@
+// ----------------------------------
+// RSDK Project: Sonic 1/Sonic 2
+// Script Description: Decoration
+// Script Author: Christian Whitehead/Simon Thomley
+// Unpacked by Rubberduckycooly's script unpacker
+// ----------------------------------
+
+//-------Aliases-------//
+private alias 28 : TYPE_DECORATION
+private alias object.value1 : object.fireframe
+
+public value barScore = 0;
+
+event ObjectMain
+
+end event
+
+event ObjectDraw
+	object.drawOrder = 3
+
+	object.ypos += object.yvel
+//	object.yvel += 5
+
+	currentPlayer = 0
+	while currentPlayer < 2
+	BoxCollisionTest(C_BOX, object.entityPos, -256, -10, 256, 10, currentPlayer, HITBOX_AUTO, HITBOX_AUTO, HITBOX_AUTO, HITBOX_AUTO)
+	currentPlayer++
+	loop
+
+	if object.frame == 0
+		object.fireframe++
+		object.fireframe %= 15	
+		temp0 = object.fireframe
+		temp0 >>= 2
+		temp0 += 4
+
+		if object.fireframe >= 6
+			object.direction = 1
+		else
+			object.direction = 0
+		end if
+
+		temp1 = object.xpos
+		DrawSpriteXY(8, temp1, object.ypos)	
+		DrawSpriteXY(9, temp1, object.ypos)	
+		DrawSpriteXY(10, temp1, object.ypos)	
+		DrawSpriteXY(11, temp1, object.ypos)			
+
+		if object.visible == 1
+			DrawSpriteFX(temp0, FX_FLIP, object.xpos, object.ypos)
+		end if
+	end if
+
+
+	BoxCollisionTest(C_TOUCH, object.entityPos, -256, -10, 256, 10, 0, HITBOX_AUTO, HITBOX_AUTO, HITBOX_AUTO, HITBOX_AUTO)
+	if checkResult == 1	
+		ResetObjectEntity(2, TypeName[Music Event], 0, 0, 0)
+		object[2].propertyValue = 11
+		object[2].DrawOrder = 6
+		object[2].Priority = PRIORITY_ACTIVE
+	end if
+
+	
+	//DrawSpriteXY(0, object.xpos, object.ypos)
+end event
+
+
+event ObjectStartup
+	LoadSpriteSheet("Blueprint/Objects.gif")		
+	SpriteFrame(0, 0, 16, 24, 1, 151) //0
+	SpriteFrame(0, 0, 16, 24, 18, 151) //0	
+	SpriteFrame(0, 0, 16, 24, 35, 151) //0		
+	SpriteFrame(0, 0, 16, 24, 52, 151) //0	
+
+	SpriteFrame(-256, -200, 512, 256, 0, 256) //4 THE FLAMES OF DIASTER		
+	SpriteFrame(-256, -200, 512, 256, 0, 256) //4 THE FLAMES OF DIASTER			
+	SpriteFrame(-256, -200, 512, 256, 0, 256) //4 THE FLAMES OF DIASTER		
+	SpriteFrame(-256, -200, 512, 256, 0, 256) //4 THE FLAMES OF DIASTER			
+
+	SpriteFrame(-256, -36, 128, 128, 383, 127)	//8 gradient	
+	SpriteFrame(-128, -36, 128, 128, 383, 127)	//9 gradient		 aggain
+	SpriteFrame(0, -36, 128, 128, 383, 127)	//9 gradient		 aggain
+	SpriteFrame(128, -36, 128, 128, 383, 127)	//8 gradient	
+end event
+
+event RSDKDraw
+	DrawSprite(0)
+end event
+
+event RSDKLoad
+	LoadSpriteSheet("Global/Display.gif")
+	SpriteFrame(-16, -16, 32, 32, 1, 143)
+end event

@@ -1,0 +1,175 @@
+// ----------------------------------
+// RSDK Project: Sonic 1/Sonic 2
+// Script Description: Menu Control Object
+// Script Author: Christian Whitehead/Simon Thomley
+// Unpacked by Rubberduckycooly's script unpacker
+// ----------------------------------
+
+//-------Aliases-------//
+public value bossdefeated = 0;
+
+event ObjectMain
+	
+	switch object.propertyValue
+	case 0	///normal
+	object.drawOrder = 4
+	if object.outofbounds == 0
+		currentPlayer = 0
+		while currentPlayer < 2
+		BoxCollisionTest(C_BOX, object.entityPos, -16, 0, 16, 32, currentPlayer, HITBOX_AUTO, HITBOX_AUTO, HITBOX_AUTO, HITBOX_AUTO)
+		currentPlayer++
+		loop
+	end if
+	break
+	case 1	///2017 no collision
+	object.drawOrder = 4
+	if object.outofbounds == 0
+		BoxCollisionTest(C_BOX, object.entityPos, -16, 0, 16, 32, 0, HITBOX_AUTO, HITBOX_AUTO, HITBOX_AUTO, HITBOX_AUTO)
+		object.inkEffect = INK_ALPHA
+		object.alpha = 160
+	end if
+	break	
+	case 2	///disappear phase 2
+	object.drawOrder = 4
+	if object[1].state < 3
+		if object.outofbounds == 0
+			currentPlayer = 0
+			while currentPlayer < 2
+			BoxCollisionTest(C_BOX, object.entityPos, -16, 0, 16, 32, currentPlayer, HITBOX_AUTO, HITBOX_AUTO, HITBOX_AUTO, HITBOX_AUTO)
+			currentPlayer++
+			loop
+		end if
+	else
+	
+	end if	
+	break	
+	case 3	///phase 2 activate
+	object.drawOrder = 4
+	if object[1].state >= 3
+		if object.outofbounds == 0
+			currentPlayer = 0
+			while currentPlayer < 2
+			BoxCollisionTest(C_BOX, object.entityPos, -16, 0, 16, 32, currentPlayer, HITBOX_AUTO, HITBOX_AUTO, HITBOX_AUTO, HITBOX_AUTO)
+			currentPlayer++
+			loop
+		end if
+	else
+	
+	end if	
+	break	
+	case 4	///phase 2 activate
+		object.drawOrder = 6
+		switch object.state
+		case 0
+			if object[1].state >= 3
+		
+
+				if object[0].ypos < object.ypos
+					object[1].type = TypeName[blank object]
+					bossdefeated = 1
+					object.value1 = 0
+					object.state++
+
+					if object.outofbounds == 0
+						currentPlayer = 0
+						while currentPlayer < 2
+						BoxCollisionTest(C_BOX, object.entityPos, -16, 0, 16, 32, currentPlayer, HITBOX_AUTO, HITBOX_AUTO, HITBOX_AUTO, HITBOX_AUTO)
+						currentPlayer++
+						loop
+					end if
+
+				else
+				
+
+				end if
+			
+			end if
+		break
+		case 1
+			if object.outofbounds == 0
+				currentPlayer = 0
+				while currentPlayer < 2
+				BoxCollisionTest(C_BOX, object.entityPos, -16, 0, 16, 32, currentPlayer, HITBOX_AUTO, HITBOX_AUTO, HITBOX_AUTO, HITBOX_AUTO)
+				currentPlayer++
+				loop
+			end if
+
+			object.value1 += 1
+
+			object.value0++
+			if object.value0 == 2
+				PlayMusic(2)
+			end if
+			
+			if object.value0 == 600
+				stage.listPos = 0
+				stage.activeList = PRESENTATION_STAGE
+				LoadStage()
+			end if
+
+		break			
+		end switch	
+	break			
+	end switch
+
+end event
+
+
+event ObjectDraw
+	switch object.propertyValue
+	case 2
+		if object[1].state < 3
+			DrawSpriteFX(object.propertyValue, FX_INK, object.xpos, object.ypos)	//slot 1
+		end if
+	break	
+	case 3
+		if object[1].state >= 3
+			DrawSpriteFX(object.propertyValue, FX_INK, object.xpos, object.ypos)	//slot 1
+		end if
+	break	
+	case 4
+		switch object.state
+		case 0
+			if object[1].state >= 3
+				if object[0].ypos < object.ypos
+					DrawRect(0, 0, screen.xsize, screen.ysize, 0, 0, 0, object.value1)	
+					DrawSpriteXY(object.propertyValue, object.xpos, object.ypos)	//slot 1
+					DrawRect(0, 0, screen.xsize, screen.ysize, 0, 0, 0, object.value1)	
+				end if
+			end if
+		break
+		case 1
+			DrawRect(0, 0, screen.xsize, screen.ysize, 0, 0, 0, object.value1)	
+			DrawSpriteXY(object.propertyValue, object.xpos, object.ypos)	//slot 1
+			DrawRect(0, 0, screen.xsize, screen.ysize, 0, 0, 0, object.value1)	
+		break
+		end switch
+	break	
+	default
+	DrawSpriteFX(object.propertyValue, FX_INK, object.xpos, object.ypos)	//slot 1
+	break
+	end switch
+end event
+
+
+event ObjectStartup
+	LoadSpriteSheet("Blueprint/Objects.gif")
+	SpriteFrame(-16, 0, 32, 32, 221, 1)	//test sprite	
+	SpriteFrame(-16, 0, 32, 32, 254, 1)	//test sprite	
+	SpriteFrame(-16, 0, 32, 32, 287, 1)	//test sprite	
+	SpriteFrame(-16, 0, 32, 32, 287, 1)	//test sprite	
+	SpriteFrame(-16, 0, 32, 32, 287, 1)	//test sprite		
+	foreach (TypeName[Block], arrayPos0, ALL_ENTITIES)
+		object[arrayPos0].priority = PRIORITY_ACTIVE
+	next		
+end event
+
+event RSDKDraw
+	DrawSpriteFX(object.propertyValue, FX_INK, object.xpos, object.ypos)	//slot 1
+end event
+
+event RSDKLoad
+	LoadSpriteSheet("Blueprint/Objects.gif")
+	SpriteFrame(-16, 0, 32, 32, 221, 1)	//test sprite	
+	SpriteFrame(-16, 0, 32, 32, 254, 1)	//test sprite	
+end event

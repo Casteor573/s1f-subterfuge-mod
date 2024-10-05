@@ -1,0 +1,234 @@
+// ----------------------------------
+// RSDK Project: Sonic 1/Sonic 2
+// Script Description: Decoration
+// Script Author: Christian Whitehead/Simon Thomley
+// Unpacked by Rubberduckycooly's script unpacker
+// ----------------------------------
+
+//-------Aliases-------//
+private alias 28 : TYPE_DECORATION
+
+private alias object.value2 : health.restore
+private alias object.value3 : stamina.restore
+
+public value barScore = 0;
+public value playerhealth = 0;
+
+event ObjectMain
+
+
+
+	object.value1 = 165	//starting position
+
+	if barScore >= 165	//dont go over the limit
+		barScore = 165
+	end if
+
+
+	if inputDown[0].buttonA == 1
+		CheckGreater(object[0].xvel, 1)
+		temp0 = checkResult
+		CheckLower(object[0].xvel, -1)
+		temp0 |= checkResult		
+		CheckGreater(object[0].yvel, 1)
+		temp0 |= checkResult
+		CheckLower(object[0].yvel, -1)
+		temp0 |= checkResult		
+		if temp0 == 1
+			if barScore >= -1
+				object.value4++
+				if object.value4 == 2
+					barScore--
+					object.value4 = 0
+				end if
+			end if
+		end if	
+		//ur running
+	else	//if ur not moving refill stamina
+		CheckEqual(object[0].xvel, 0)
+		temp0 = checkResult
+		CheckEqual(object[0].yvel, 0)
+		temp0 &= checkResult
+		CheckEqual(object[0].speed, 0)
+		temp0 &= checkResult		
+		if temp0 == 1
+			barScore += 1
+		end if
+		
+		if inputDown[0].buttonA == 0
+			if barScore >= 0
+				stamina.restore++
+				if stamina.restore == 10
+				barScore += 1
+				stamina.restore = 0
+				end if
+			end if
+		end if
+	end if
+
+
+
+	object.value1 -= barScore
+
+
+end event
+
+event ObjectDraw
+	CheckGreater(object[0].controlmode, -1)
+	temp2 = checkResult
+	if temp2 == 1
+		if object[1].state < 3
+			object.drawOrder = 5
+
+
+
+			temp3 = screen.xcenter
+			temp3 -= 200
+			temp4 = screen.ycenter
+			temp4 -= 80
+
+
+			DrawRect(temp3, temp4, 24, 165, 0, color7, 0, 255)	
+
+
+			temp3 = screen.xcenter
+			temp3 -= 200
+			temp4 = screen.ycenter
+			temp4 -= 80
+
+			abs(object.value1)
+
+			DrawRect(temp3, temp4, 24, object.value1, color7, 0, 0, 255)	
+
+			//DrawSpriteScreenXY(1, object.value1, 189)
+
+			temp3 = screen.xcenter
+			temp3 -= 170
+			temp4 = screen.ycenter
+			temp4 += 30
+			DrawSpriteScreenXY(6, temp3, temp4)
+			temp4 -= 20
+			DrawSpriteScreenXY(6, temp3, temp4)
+			temp4 -= 20
+			DrawSpriteScreenXY(6, temp3, temp4)
+			temp4 -= 20
+			DrawSpriteScreenXY(6, temp3, temp4)
+			temp4 -= 20
+			DrawSpriteScreenXY(6, temp3, temp4)			
+
+			switch playerhealth
+			case 5
+				temp3 = screen.xcenter
+				temp3 -= 170
+				temp4 = screen.ycenter
+				temp4 += 30
+				DrawSpriteScreenXY(5, temp3, temp4)
+				temp4 -= 20
+				DrawSpriteScreenXY(5, temp3, temp4)
+				temp4 -= 20
+				DrawSpriteScreenXY(5, temp3, temp4)
+				temp4 -= 20
+				DrawSpriteScreenXY(5, temp3, temp4)
+				temp4 -= 20
+				DrawSpriteScreenXY(5, temp3, temp4)	
+			break
+			case 4
+				temp3 = screen.xcenter
+				temp3 -= 170
+				temp4 = screen.ycenter
+				temp4 += 30
+				DrawSpriteScreenXY(5, temp3, temp4)
+				temp4 -= 20
+				DrawSpriteScreenXY(5, temp3, temp4)
+				temp4 -= 20
+				DrawSpriteScreenXY(5, temp3, temp4)
+				temp4 -= 20
+				DrawSpriteScreenXY(5, temp3, temp4)
+			break
+			case 3
+				temp3 = screen.xcenter
+				temp3 -= 170
+				temp4 = screen.ycenter
+				temp4 += 30
+				DrawSpriteScreenXY(5, temp3, temp4)
+				temp4 -= 20
+				DrawSpriteScreenXY(5, temp3, temp4)
+				temp4 -= 20
+				DrawSpriteScreenXY(5, temp3, temp4)
+			break	
+			case 2
+				temp3 = screen.xcenter
+				temp3 -= 170
+				temp4 = screen.ycenter
+				temp4 += 30
+				DrawSpriteScreenXY(5, temp3, temp4)
+				temp4 -= 20
+				DrawSpriteScreenXY(5, temp3, temp4)
+			break		
+			case 1
+				temp3 = screen.xcenter
+				temp3 -= 170
+				temp4 = screen.ycenter
+				temp4 += 30
+				DrawSpriteScreenXY(5, temp3, temp4)
+			break
+			case 0
+			if playerhealth <= 0
+				object[0].state = OpenPlayer_Dead
+			end if
+			break
+			end switch
+
+			if playerhealth > 0
+				if playerhealth < 5
+					health.restore++
+					if health.restore == 500
+						playerhealth += 1
+						health.restore = 0
+					end if
+				end if
+			end if	
+
+
+
+
+		//	temp3 = screen.xcenter
+		//	temp3 -= 100
+		//	temp4 = screen.ycenter
+		//	temp4 += 55
+		//	DrawSpriteScreenXY(3, temp3, temp4)
+
+		//	temp3 = screen.xcenter
+		//	temp3 -= 120
+		//	temp4 = screen.ycenter
+		//	temp4 -= 110
+		//	DrawSpriteScreenXY(4, temp3, temp4)	
+		end if
+	end if
+	object.priority = PRIORITY_ACTIVE
+end event
+
+
+event ObjectStartup
+	barScore = 0	
+
+	LoadSpriteSheet("Blueprint/Objects.gif")
+	SpriteFrame(0, -20, 187, 63, 26, 1)	//meter
+	SpriteFrame(10, 0, 6, 26, 214, 1)	//blue thing
+	SpriteFrame(10, 0, 137, 22, 26, 65)	//the
+
+	SpriteFrame(10, 0, 183, 50, 1, 205)	//craft ?	
+	SpriteFrame(10, 0, 224, 28, 1, 176)	//mark	 ?		
+
+	SpriteFrame(0, 0, 18, 18, 347, 237)	//5 ring	
+	SpriteFrame(0, 0, 18, 18, 328, 237)	//6 meno ringter	
+end event
+
+event RSDKDraw
+	DrawSprite(0)
+end event
+
+event RSDKLoad
+	LoadSpriteSheet("Global/Display.gif")
+	SpriteFrame(-16, -16, 32, 32, 1, 143)
+end event

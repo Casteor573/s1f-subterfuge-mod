@@ -1,0 +1,332 @@
+// ----------------------------------
+// RSDK Project: Sonic 1/Sonic 2
+// Script Description: Decoration
+// Script Author: Christian Whitehead/Simon Thomley
+// Unpacked by Rubberduckycooly's script unpacker
+// ----------------------------------
+
+//-------Aliases-------//
+public alias  256 		: GROUP_PLAYERS
+public alias  65536 	: HITBOX_AUTO
+public alias  arrayPos6 : currentPlayer
+private alias 28 : TYPE_DECORATION
+
+private alias object.value1 : object.speedcap
+private alias object.value2 : object.speedone
+private alias object.value3 : object.speedtwo
+public value playerhealth = 0;
+
+event ObjectMain
+	if object[0].ypos > object.ypos
+		object.drawOrder = 4
+	else
+		object.drawOrder = 5
+	end if
+
+	object.gravity = GRAVITY_AIR
+	object.priority = PRIORITY_ACTIVE
+
+	switch object.state
+	case 0
+		object.value0++
+		object.animation = 1		
+		if object.value0 == 320
+			object.value0 = 0
+			object.animation = 7
+			object.state++
+		end if
+	break
+	case 1
+		object.value0++
+		if object.value0 == 150
+			object.state++
+		end if	
+	break	
+	case 2
+
+
+
+		BoxCollisionTest(C_TOUCH, object.entityPos, -12, -18, 12, 18, 0, HITBOX_AUTO, HITBOX_AUTO, HITBOX_AUTO, HITBOX_AUTO)
+		if checkResult == 1
+			if object[0].value6 <= 0
+				object[0].value6 = 120
+				playerhealth -= 1
+				PlaySfx(SfxName[Thud], 0)
+			end if
+		end if
+
+		CheckGreater(object.yvel, 1)
+		temp0 = checkResult
+		CheckLower(object.xvel, 0x2000)
+		temp0 &= checkResult		
+		CheckGreater(object.xvel, -0x2000)
+		temp0 &= checkResult
+		if temp0 == 1
+			object.animation = 4
+			object.direction = 0
+		else
+			CheckLower(object.yvel, 1)
+			temp0 = checkResult
+			CheckLower(object.xvel, 0x2000)
+			temp0 &= checkResult		
+			CheckGreater(object.xvel, -0x2000)
+			temp0 &= checkResult
+			if temp0 == 1
+				object.animation = 6
+				object.direction = 0
+			else
+				CheckGreater(object.xvel, 1)
+				temp0 = checkResult
+				CheckLower(object.yvel, 0x2000)
+				temp0 &= checkResult		
+				CheckGreater(object.yvel, -0x2000)
+				temp0 &= checkResult
+				if temp0 == 1
+					object.animation = 5
+					object.direction = 1
+				else
+					CheckLower(object.xvel, 1)
+					temp0 = checkResult
+					CheckLower(object.yvel, 0x2000)
+					temp0 &= checkResult		
+					CheckGreater(object.yvel, -0x2000)
+					temp0 &= checkResult
+					if temp0 == 1			
+					object.animation = 5
+					object.direction = 0
+					end if
+				end if
+			end if
+		end if
+
+
+		BoxCollisionTest(C_TOUCH, object.entityPos, -96, -96, 96, 96, 0, HITBOX_AUTO, HITBOX_AUTO, HITBOX_AUTO, HITBOX_AUTO)
+		if checkResult == 1
+			object.speedcap = 0x85000
+			object.speedone = 0x3000
+			object.speedtwo = 0x1500		
+		else
+			object.speedcap = 0x70000
+			object.speedone = 0x2800
+			object.speedtwo = 0x1400
+		end if
+
+
+		if object.xpos > object[0].xpos //right
+			if object.xvel > 0	//right
+				object.xvel -= object.speedone
+				if object.xvel > object.speedcap	//speed cap
+					object.xvel = object.speedcap
+				end if			
+			else
+				object.xvel -= object.speedtwo
+				if object.xvel > object.speedcap	//speed cap
+					object.xvel = object.speedcap
+				end if				
+			end if
+		else	//left
+			if object.xvel < 0
+				object.xvel += object.speedone
+				if object.xvel > object.speedcap	//speed cap
+					object.xvel = object.speedcap
+				end if				
+			else
+				object.xvel += object.speedtwo
+				if object.xvel > object.speedcap	//speed cap
+					object.xvel = object.speedcap
+				end if				
+			end if
+		end if
+		if object.ypos > object[0].ypos	//up 
+			if object.yvel > 0
+				object.yvel -= object.speedone
+				if object.yvel > object.speedcap	//speed cap
+					object.yvel = object.speedcap
+				end if					
+			else
+				object.yvel -= object.speedtwo
+				if object.yvel > object.speedcap	//speed cap
+					object.yvel = object.speedcap
+				end if					
+			end if
+		else	//down
+			if object.yvel < 0
+				object.yvel += object.speedone
+				if object.yvel > object.speedcap	//speed cap
+					object.yvel = object.speedcap
+				end if					
+			else
+				object.yvel += object.speedtwo
+				if object.yvel > object.speedcap	//speed cap
+					object.yvel = object.speedcap
+				end if					
+			end if
+		end if	
+
+		object.speed = object.xvel
+
+
+	break
+	case 3	//cutscene
+	object.xvel = 0
+	object.yvel = 0
+	object.speed = 0
+	object.animation = 2
+	object.direction = 0
+
+	break
+	case 4
+
+
+
+		BoxCollisionTest(C_TOUCH, object.entityPos, -12, -18, 12, 18, 0, HITBOX_AUTO, HITBOX_AUTO, HITBOX_AUTO, HITBOX_AUTO)
+		if checkResult == 1
+			if object[0].value6 <= 0
+				object[0].value6 = 120
+				playerhealth -= 1
+				PlaySfx(SfxName[Thud], 0)
+			end if
+		end if
+
+		CheckGreater(object.yvel, 1)
+		temp0 = checkResult
+		CheckLower(object.xvel, 0x3000)
+		temp0 &= checkResult		
+		CheckGreater(object.xvel, -0x3000)
+		temp0 &= checkResult
+		if temp0 == 1
+			object.animation = 4
+			object.direction = 0
+		else
+			CheckLower(object.yvel, 1)
+			temp0 = checkResult
+			CheckLower(object.xvel, 0x3000)
+			temp0 &= checkResult		
+			CheckGreater(object.xvel, -0x3000)
+			temp0 &= checkResult
+			if temp0 == 1
+				object.animation = 6
+				object.direction = 0
+			else
+				CheckGreater(object.xvel, 1)
+				temp0 = checkResult
+				CheckLower(object.yvel, 0x3000)
+				temp0 &= checkResult		
+				CheckGreater(object.yvel, -0x3000)
+				temp0 &= checkResult
+				if temp0 == 1
+					object.animation = 5
+					object.direction = 1
+				else
+					CheckLower(object.xvel, 1)
+					temp0 = checkResult
+					CheckLower(object.yvel, 0x3000)
+					temp0 &= checkResult		
+					CheckGreater(object.yvel, -0x3000)
+					temp0 &= checkResult
+					if temp0 == 1			
+					object.animation = 5
+					object.direction = 0
+					end if
+				end if
+			end if
+		end if
+
+
+		BoxCollisionTest(C_TOUCH, object.entityPos, -96, -96, 96, 96, 0, HITBOX_AUTO, HITBOX_AUTO, HITBOX_AUTO, HITBOX_AUTO)
+		if checkResult == 1
+			object.speedcap = 0x95000
+			object.speedone = 0x4000
+			object.speedtwo = 0x2000		
+		else
+			object.speedcap = 0x90000
+			object.speedone = 0x3500
+			object.speedtwo = 0x2000	
+		end if
+
+
+		if object.xpos > object[0].xpos //right
+			if object.xvel > 0	//right
+				object.xvel -= object.speedone
+				if object.xvel > object.speedcap	//speed cap
+					object.xvel = object.speedcap
+				end if			
+			else
+				object.xvel -= object.speedtwo
+				if object.xvel > object.speedcap	//speed cap
+					object.xvel = object.speedcap
+				end if				
+			end if
+		else	//left
+			if object.xvel < 0
+				object.xvel += object.speedone
+				if object.xvel > object.speedcap	//speed cap
+					object.xvel = object.speedcap
+				end if				
+			else
+				object.xvel += object.speedtwo
+				if object.xvel > object.speedcap	//speed cap
+					object.xvel = object.speedcap
+				end if				
+			end if
+		end if
+		if object.ypos > object[0].ypos	//up 
+			if object.yvel > 0
+				object.yvel -= object.speedone
+				if object.yvel > object.speedcap	//speed cap
+					object.yvel = object.speedcap
+				end if					
+			else
+				object.yvel -= object.speedtwo
+				if object.yvel > object.speedcap	//speed cap
+					object.yvel = object.speedcap
+				end if					
+			end if
+		else	//down
+			if object.yvel < 0
+				object.yvel += object.speedone
+				if object.yvel > object.speedcap	//speed cap
+					object.yvel = object.speedcap
+				end if					
+			else
+				object.yvel += object.speedtwo
+				if object.yvel > object.speedcap	//speed cap
+					object.yvel = object.speedcap
+				end if					
+			end if
+		end if	
+
+		object.speed = object.xvel
+
+
+	break	
+	end switch
+	
+	ProcessObjectMovement()	
+end event
+
+event ObjectDraw
+	ProcessAnimation()		
+	DrawObjectAnimation()
+	
+end event
+
+
+event ObjectStartup
+	foreach (TypeName[Subterfuge], arrayPos0, ALL_ENTITIES)
+		LoadAnimation("2017X.ani")
+		ResetObjectEntity(1, TypeName[Subterfuge], 1, object[arrayPos0].xpos, object[arrayPos0].ypos)
+		object[arrayPos0].priority = PRIORITY_ACTIVE
+		currentPlayer = 1
+		ResetObjectEntity(arrayPos0, TypeName[Blank Object], 0, 0, 0)		
+	next	
+end event
+
+event RSDKDraw
+	DrawSprite(0)
+end event
+
+event RSDKLoad
+	LoadSpriteSheet("Global/Display.gif")
+	SpriteFrame(-16, -16, 32, 32, 1, 143)
+end event

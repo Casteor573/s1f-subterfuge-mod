@@ -1,0 +1,41 @@
+// ----------------------------------
+// RSDK Project: Sonic 1/Sonic 2
+// Script Description: Menu Control Object
+// Script Author: Christian Whitehead/Simon Thomley
+// Unpacked by Rubberduckycooly's script unpacker
+// ----------------------------------
+
+//-------Aliases-------//
+
+
+event ObjectMain
+
+	object.drawOrder = 3
+    foreach (GROUP_PLAYERS, currentPlayer, ACTIVE_ENTITIES)
+		BoxCollisionTest(C_BOX, object.entityPos, 22, -10, 42, 30, currentPlayer, HITBOX_AUTO, HITBOX_AUTO, HITBOX_AUTO, HITBOX_AUTO)
+		if checkResult == 1
+
+		end if
+	next	
+end event
+
+
+event ObjectDraw
+
+	DrawSprite(0, object.xpos, object.ypos)	//slot 1
+end event
+
+
+event ObjectStartup
+	LoadSpriteSheet("Blueprint/Objects.gif")
+	SpriteFrame(20, -10, 24, 51, 1, 1)	//test sprite
+end event
+
+event RSDKDraw
+	DrawSprite(0)
+end event
+
+event RSDKLoad
+	LoadSpriteSheet("Global/Display.gif")
+	SpriteFrame(-16, -16, 32, 32, 1, 143)
+end event

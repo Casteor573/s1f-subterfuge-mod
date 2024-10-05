@@ -1,0 +1,431 @@
+// ----------------------------------
+// RSDK Project: Sonic 1/Sonic 2
+// Script Description: Menu Control Object
+// Script Author: Christian Whitehead/Simon Thomley
+// Unpacked by Rubberduckycooly's script unpacker
+// ----------------------------------
+
+//-------Aliases-------//
+private alias 1 		: TYPE_PLAYEROBJECT
+public alias  256 		: GROUP_PLAYERS
+public alias  65536 	: HITBOX_AUTO
+public alias  arrayPos6 : currentPlayer
+public alias  arrayPos7 : playerCount
+private alias object.value1 : object.prevdirection
+private alias object.value2 : object.postivecap
+private alias object.value3 : object.negativecap
+private alias object.value4 : player.tailsFrame
+private alias object.value5 : player.tailsAnim
+private alias object.value6 : player.invulnerable
+private alias object.value38 : player.hitboxTop
+private alias object.value39 : player.hitboxBottom
+private alias object.value40 : player.hitboxLeft
+private alias object.value41 : player.hitboxRight
+
+reserve function OpenPlayer_Idle
+reserve function OpenPlayer_CamControl
+reserve function OpenPlayer_TailsAnim
+reserve function OpenPlayer_Dead
+public value barScore = 0;
+public value cameraup = 0;
+public value playerhealth = 0;
+
+function OpenPlayer_TailsAnim
+	if object.animation != object.prevAnimation
+		object.prevAnimation = object.animation
+		object.frame = 0
+		object.animationTimer = 0
+		object.animationSpeed = 0
+	end if
+	if player.tailsAnim != object.animation
+		player.tailsAnim = object.animation
+	end if
+	switch player.tailsAnim
+	case 1
+		if object.frame == 0
+			player.tailsFrame++
+			player.tailsFrame %= 60	
+			temp0 = player.tailsFrame
+			temp0 >>= 3
+			if object.visible == 1
+				DrawSpriteFX(temp0, FX_FLIP, object.xpos, object.ypos)
+			end if
+		end if
+		break
+	case 2	
+		object.direction = 1
+		if object.frame == 0
+			player.tailsFrame++
+			player.tailsFrame %= 40	
+			temp0 = player.tailsFrame
+			temp0 >>= 3
+			temp0 += 8
+			if object.visible == 1
+				DrawSpriteFX(temp0, FX_FLIP, object.xpos, object.ypos)
+			end if
+		end if
+		break	
+	case 3
+		if object.frame == 0
+			player.tailsFrame++
+			player.tailsFrame %= 40	
+			temp0 = player.tailsFrame
+			temp0 >>= 3
+			temp0 += 8
+			if object.visible == 1
+				DrawSpriteFX(temp0, FX_FLIP, object.xpos, object.ypos)
+			end if
+		end if
+		break		
+	end switch	
+end function
+
+
+// Static Values
+
+// Tables
+
+
+
+function OpenPlayer_CamControl
+if inputDown.buttonB == 1
+	if object[1].ypos > object.ypos
+		temp0 = object.ypos
+		temp0 >>= 16
+		temp0 -= screen.cameraY
+		temp0 += 64
+		if object.lookPosY < temp0
+			object.lookPosY += 2
+		end if	
+	else
+		temp0 = object.ypos
+		temp0 >>= 16
+		temp0 -= screen.cameraY
+		temp0 -= 96
+		if object.lookPosY > temp0
+			object.lookPosY -= 2
+		end if
+	end if	
+
+else
+	switch cameraup
+	case 1
+		temp0 = object.ypos
+		temp0 >>= 16
+		temp0 -= screen.cameraY
+		temp0 -= 96
+		if object.lookPosY > temp0
+			object.lookPosY -= 2
+		end if
+	break
+	case 2
+		temp0 = object.ypos
+		temp0 >>= 16
+		temp0 -= screen.cameraY
+		temp0 -= 96
+		if object.lookPosY > temp0
+			object.lookPosY -= 2
+		end if
+	break
+	default
+		if object.lookPosY > 0
+			object.lookPosY -= 2
+		end if
+		if object.lookPosY < 0
+			object.lookPosY += 2
+		end if	
+	break
+	end switch
+
+end if	
+end function
+
+function OpenPlayer_Idle
+
+	if playerhealth <= 0
+		object.controlMode = -1
+		object.xvel = 0
+		object.yvel = 0
+		object.speed = 0
+		object.direction = 0		
+	end if	
+	
+	if object[0].controlMode == CONTROLMODE_NORMAL
+		if inputpress[0].Start == true
+			inputpress[0].Start = false
+			stage.state =  STAGE_FROZEN
+			PauseMusic()
+			ResetObjectEntity(9, TypeName[Music Event], 0, 0, 0)
+			object[9].propertyValue = 10
+			object[9].DrawOrder = 6
+			object[9].Priority = PRIORITY_ACTIVE
+		end if
+	end if
+
+
+
+	if player.invulnerable > 0
+		player.invulnerable--
+		GetBit(temp0, player.invulnerable, 2)
+		if temp0 == 1
+			object.visible = 0
+		else
+			object.visible = 1
+		end if
+	end if
+
+
+	ProcessObjectControl()
+	object.gravity = GRAVITY_AIR
+
+	temp5 = 0
+
+
+//	object.controlmode = 0
+//	playerhealth = 3
+
+	if object.controlmode > -1
+		SetBit(temp5, 0, object.up)
+		SetBit(temp5, 1, object.down)
+		SetBit(temp5, 2, object.left)
+		SetBit(temp5, 3, object.right)
+	
+	
+	CheckNotEqual(temp5, 0)	//if nothing is being held
+	temp4 = checkResult
+	CheckLower(temp5, 12)	//if both left and right are being held
+	temp4 &= checkResult
+
+	CallFunction(OpenPlayer_CamControl)
+			
+
+	if temp4 == 1	//chekc passed
+	
+		CheckGreater(object.xvel, -1)	//if nothing is being held
+		temp3 = checkResult
+		CheckGreater(object.yvel, -1)	//if both left and right are being held
+		temp3 |= checkResult
+		if temp3 == 1
+			switch temp5	//thx elsie
+				case 0    //forward
+				case 2 //down
+				case 10 //right and down
+				case 6 //left and down
+				case 12 //right and left
+				case 13 //right left and up
+				case 14 //right left and down
+				case 15 //right left up and down why did you press all of them what are you doing
+					object.prevdirection = 0
+					object.direction = 0	
+					object.animation = 4	//down
+					break
+				case 1 //up
+				case 5 //left and up
+				case 9 //right and up			
+					object.prevdirection = 1
+					object.animation = 6	//up
+					object.direction = 0	
+					break
+				case 4 //left
+				case 7 //left up and down
+					object.prevdirection = 2
+					object.animation = 5
+					object.direction = 0	
+				break	  
+				case 8 //right
+				case 11 //right up and down
+					object.prevdirection = 3
+					object.animation = 5
+					object.direction = 1
+				break		
+				case 3 //up and down
+					object.animation = 0
+					object.direction = 0	
+				break	                       
+			end switch	
+	
+		end if
+
+	if object[1].state < 3
+		if barScore > 0		//< 165   for horzionital
+			if inputDown.buttonA == 1
+				object.postivecap = 0x30000
+				object.negativecap = -0x30000
+			else
+				object.postivecap = 0x16500
+				object.negativecap = -0x16500
+			end if
+		else
+			object.postivecap = 0x16500
+			object.negativecap = -0x16500
+		end if	
+	else
+		if barScore > 0		//< 165   for horzionital
+			if inputDown.buttonA == 1
+				object.postivecap = 0x40000
+				object.negativecap = -0x40000
+			else
+				object.postivecap = 0x35000
+				object.negativecap = -0x35000
+			end if
+		else
+			object.postivecap = 0x35000
+			object.negativecap = -0x35000
+		end if	
+	end if	
+
+		temp6 = temp5
+		temp6 &= 3
+		switch temp6	
+			case 1	//hold up
+				if object.yvel >= object.negativecap
+					object.yvel -= 0x5500
+				else
+					object.yvel = object.negativecap
+				end if	
+				break
+			case 2	//hold down
+				if object.yvel <= object.postivecap
+					object.yvel += 0x5500
+				else
+					object.yvel = object.postivecap
+				end if	
+			
+				break
+			default	//none
+				object.yvel = 0
+				break
+		end switch
+		
+		temp6 = temp5
+		temp6 &= 12
+		switch temp6
+			case 4	//left
+				if object.xvel >= object.negativecap
+					object.xvel -= 0x5500
+				else
+					object.xvel = object.negativecap
+				end if	
+				
+				break
+			case 8	//right
+				if object.xvel <= object.postivecap
+					object.xvel += 0x5500
+				else
+					object.xvel = object.postivecap
+				end if	
+				
+				break
+			default
+				object.xvel = 0
+				break
+		end switch
+		object.speed = object.xvel
+	else
+		object.animation = object.prevdirection	//down
+		object.xvel = 0
+		object.yvel = 0
+		object.speed = 0
+		object.direction = 0	
+	end if	
+	else
+	CallFunction(OpenPlayer_CamControl)
+
+	end if
+	object.drawOrder = 5
+end function
+
+
+function OpenPlayer_Dead
+	object.xvel = 0
+	object.yvel = 0
+	object.speed = 0
+	object.direction = 0
+end function
+
+event ObjectMain
+	ProcessObjectMovement()
+	CallFunction(OpenPlayer_Idle)
+end event
+
+
+event ObjectDraw
+//	DrawSprite(0, object.xpos, object.ypos)	//slot 1
+	ProcessAnimation()		
+	DrawObjectAnimation()
+	
+	if stage.playerListPos == 1
+		CallFunction(OpenPlayer_TailsAnim)
+	end if
+end event
+
+
+event ObjectStartup
+	foreach (TypeName[Open Player], arrayPos0, ALL_ENTITIES)
+		screen.cameraEnabled = 1
+		screen.cameraTarget = 0
+		currentPlayer = 0
+
+		switch stage.playerListPos
+		case 0
+			LoadAnimation("OpenSonic.ani")
+			object[0].propertyValue = 0
+			stage.player2Enabled = 0
+		break
+		case 1
+			LoadAnimation("OpenTails.ani")
+			object[0].propertyValue = 1
+		break
+		end switch
+
+
+
+		ResetObjectEntity(0, TypeName[Open Player], 0, object[arrayPos0].xpos, object[arrayPos0].ypos)
+		screen.cameraX = object[0].ixpos
+		screen.cameraY = object[0].iypos
+		object[0].groupID = GROUP_PLAYERS	
+		object[0].priority = PRIORITY_ACTIVE
+		object[0].value38 = HITBOX_AUTO
+		object[0].value39 = HITBOX_AUTO
+		object[0].value40 = HITBOX_AUTO
+		object[0].value41 = HITBOX_AUTO		
+
+
+		if stage.player2Enabled == 1
+			playerCount = 2
+		else
+			playerCount = 1
+		end if		
+
+		currentPlayer = 0	
+		ResetObjectEntity(arrayPos0, TypeName[Blank Object], 0, 0, 0)		
+	next
+
+
+	LoadSpriteSheet("Blueprint/Tails.gif")
+	//up tails
+	SpriteFrame(-5, 4, 16, 16, 1, 239)	//0
+	SpriteFrame(-6, 2, 13, 23, 18, 232)
+	SpriteFrame(-6, 0, 15, 21, 32, 234)
+	SpriteFrame(-14, 2, 20, 18, 48, 237)	
+	SpriteFrame(-12, 4, 16, 16, 69, 239)
+	SpriteFrame(-6, 4, 13, 23, 86, 232)
+	SpriteFrame(-6, -4, 15, 21, 100, 234)
+	SpriteFrame(-6, 2, 20, 18, 116, 237)		
+
+	SpriteFrame(-21, -8, 16, 23, 1, 201) //8
+	SpriteFrame(-23, -8, 18, 22, 18, 202)
+	SpriteFrame(-25, -6, 19, 18, 37, 206)
+	SpriteFrame(-24, -6, 20, 19, 57, 205)
+	SpriteFrame(-24, -6, 19, 19, 78, 205)
+
+end event
+
+event RSDKDraw
+	DrawSprite(0)
+end event
+
+event RSDKLoad
+	LoadSpriteSheet("Global/Display.gif")
+	SpriteFrame(-16, -16, 32, 32, 1, 143)
+end event

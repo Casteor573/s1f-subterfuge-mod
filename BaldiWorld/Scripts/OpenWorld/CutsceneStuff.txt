@@ -1,0 +1,90 @@
+// ----------------------------------
+// RSDK Project: Sonic 1/Sonic 2
+// Script Description: Decoration
+// Script Author: Christian Whitehead/Simon Thomley
+// Unpacked by Rubberduckycooly's script unpacker
+// ----------------------------------
+
+//-------Aliases-------//
+private alias 28 : TYPE_DECORATION
+
+event ObjectMain
+switch object.state
+	case 0
+	temp0 = 3716	//sonlvl positions work
+	temp0 <<= 16
+	Abs(temp0)
+
+	temp1 = 3879	//sonlvl positions work
+	temp1 <<= 16
+	Abs(temp1)
+
+	temp2 = 1730
+	temp2 <<= 16
+	Abs(temp2)	
+	
+
+
+	if object[0].xpos >= temp0
+		object[0].controlMode = -1
+		object[0].animation = 3
+		object[0].speed = 0
+		object[0].xvel = 0
+		object[0].yvel = 0
+		object[0].direction = 0
+		object[1].state = 3
+		object[1].xpos = temp1
+		object[0].xpos = temp0
+		object[0].ypos = temp2
+		object[1].ypos = object[0].ypos
+		PlayMusic(1)
+		object.value2 = 255
+		
+		object.state++
+	end if	
+	break
+	case 1
+
+		playerhealth = 10
+
+		object.value0++
+		barScore = 165
+		if object.value0 == 300
+			object[0].controlMode = 0
+			object.value2 = 255
+			
+			object[1].state++
+		end if
+
+		object.value2  -= 15
+		if object.value2  < 0
+			object.value2 = 0
+		end if
+
+	break
+end switch	
+
+
+end event
+
+event ObjectDraw
+object.drawOrder = 6
+DrawRect(0, 0, screen.xsize, screen.ysize, color7, color7, color7, object.value2)
+end event
+
+
+event ObjectStartup
+	LoadSpriteSheet("Blueprint/Objects.gif")		
+	foreach (TypeName[Cutscene Control], arrayPos0, ALL_ENTITIES)
+		object[arrayPos0].priority = PRIORITY_ACTIVE
+	next	
+end event
+
+event RSDKDraw
+	DrawSprite(0)
+end event
+
+event RSDKLoad
+	LoadSpriteSheet("Global/Display.gif")
+	SpriteFrame(-16, -16, 32, 32, 1, 143)
+end event

@@ -1,0 +1,121 @@
+// ----------------------------------
+// RSDK Project: Sonic 1/Sonic 2
+// Script Description: Decoration
+// Script Author: Christian Whitehead/Simon Thomley
+// Unpacked by Rubberduckycooly's script unpacker
+// ----------------------------------
+
+//-------Aliases-------//
+private alias 28 : TYPE_DECORATION
+
+public value barScore = 0;
+
+event ObjectMain
+
+
+
+	object.value1 = 165	//starting position
+
+	if barScore >= 165	//dont go over the limit
+		barScore = 165
+	end if
+
+
+	if inputDown[0].buttonA == 1
+		CheckGreater(object[0].xvel, 1)
+		temp0 = checkResult
+		CheckGreater(object[0].xvel, 1)
+		temp0 = checkResult		
+		CheckGreater(object[0].yvel, 1)
+		temp0 |= checkResult
+		CheckLower(object[0].yvel, -1)
+		temp0 |= checkResult		
+		if temp0 == 1
+			barScore++	
+		end if	
+		//ur running
+	else	//if ur not moving refill stamina
+		CheckEqual(object[0].xvel, 0)
+		temp0 = checkResult
+		CheckEqual(object[0].yvel, 0)
+		temp0 &= checkResult
+		if temp0 == 1
+			if barScore >= -1
+				barScore--
+			end if
+		end if
+	end if
+
+
+
+	object.value1 -= barScore
+
+
+end event
+
+event ObjectDraw
+
+	object.drawOrder = 5
+
+
+
+	temp3 = screen.xcenter
+	temp3 -= 200
+
+
+	DrawRect(temp3, 190, 165, 30, color7, 0, 0, 255)	
+
+
+	temp3 = screen.xcenter
+	temp3 -= 200
+
+
+	DrawRect(temp3, 190, object.value1, 30, 0, color7, 0, 255)	
+
+	DrawSpriteScreenXY(1, object.value1, 200)
+
+
+	
+	temp3 = screen.xcenter
+	temp3 -= 210
+	temp4 = screen.ycenter
+	temp4 += 75
+	DrawSpriteScreenXY(0, temp3, temp4)
+
+//	temp3 = screen.xcenter
+//	temp3 -= 100
+//	temp4 = screen.ycenter
+//	temp4 += 55
+//	DrawSpriteScreenXY(3, temp3, temp4)
+
+//	temp3 = screen.xcenter
+//	temp3 -= 120
+//	temp4 = screen.ycenter
+//	temp4 -= 110
+//	DrawSpriteScreenXY(4, temp3, temp4)	
+
+
+	object.priority = PRIORITY_ACTIVE
+end event
+
+
+event ObjectStartup
+	barScore = 0	
+
+	LoadSpriteSheet("Blueprint/Objects.gif")
+	SpriteFrame(0, -20, 187, 63, 26, 1)	//meter
+	SpriteFrame(10, 0, 6, 26, 214, 1)	//blue thing
+	SpriteFrame(10, 0, 137, 22, 26, 65)	//the
+
+	SpriteFrame(10, 0, 183, 50, 1, 205)	//craft ?	
+	SpriteFrame(10, 0, 224, 28, 1, 176)	//mark	 ?		
+end event
+
+event RSDKDraw
+	DrawSprite(0)
+end event
+
+event RSDKLoad
+	LoadSpriteSheet("Global/Display.gif")
+	SpriteFrame(-16, -16, 32, 32, 1, 143)
+end event
