@@ -99,17 +99,10 @@ event ObjectMain
 			end if
 		end if
 
-
-		BoxCollisionTest(C_TOUCH, object.entityPos, -96, -96, 96, 96, 0, HITBOX_AUTO, HITBOX_AUTO, HITBOX_AUTO, HITBOX_AUTO)
-		if checkResult == 1
-			object.speedcap = 0x85000
-			object.speedone = 0x3000
-			object.speedtwo = 0x1500		
-		else
-			object.speedcap = 0x70000
-			object.speedone = 0x2800
-			object.speedtwo = 0x1400
-		end if
+		object.speedcap = 0x68000
+		object.speedone = 0x2800
+		object.speedtwo = 0x1400
+		
 
 
 		if object.xpos > object[0].xpos //right
