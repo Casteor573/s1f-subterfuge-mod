@@ -185,8 +185,8 @@ event ObjectStartup
 	SpriteFrame(-256, -200, 512, 256, 0, 256) //0 THE FLAMES OF DIASTER		
 
 	//SetMusicTrack("SUB_Loop.ogg", 0, 328814)
-	SetMusicTrack("SUB_Loop.ogg", 0, 1)
-	SetMusicTrack("SUB_BossLoop.ogg", 1, 1)
+	SetMusicTrack("SUB_Loop.ogg", 0, 328812)
+	SetMusicTrack("SUB_BossLoop.ogg", 1, 115942)
 	SetMusicTrack("SUB_BossEnd.ogg", 2, 0)	
 
 	LoadSpriteSheet("Blueprint/Objects.gif")
